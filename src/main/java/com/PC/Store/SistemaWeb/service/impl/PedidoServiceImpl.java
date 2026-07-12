@@ -64,6 +64,7 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setUsuario(usuario);
         pedido.setFechaRegistro(LocalDate.now());
         pedido.setTotal(BigDecimal.ZERO);
+        pedido.setMetodoPago(dto.metodoPago());
         Pedido pedidoGuardado = pedidoRepository.save(pedido);
 
         List<DetallePedido> detalles = new ArrayList<>();
@@ -151,6 +152,7 @@ public class PedidoServiceImpl implements PedidoService {
                 p.getIdPedido(),
                 p.getFechaRegistro(),
                 p.getTotal(),
+                p.getMetodoPago(),
                 p.getUsuario().getIdUsuario(),
                 p.getUsuario().getNombre(),
                 detallesDTO

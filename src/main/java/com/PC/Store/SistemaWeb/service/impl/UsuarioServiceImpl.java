@@ -1,5 +1,6 @@
 package com.PC.Store.SistemaWeb.service.impl;
 
+import com.PC.Store.SistemaWeb.dto.usuario.UsuarioRegistroRequestDTO;
 import com.PC.Store.SistemaWeb.dto.usuario.UsuarioRequestDTO;
 import com.PC.Store.SistemaWeb.dto.usuario.UsuarioResponseDTO;
 import com.PC.Store.SistemaWeb.exception.BusinessException;
@@ -8,16 +9,19 @@ import com.PC.Store.SistemaWeb.model.Usuario;
 import com.PC.Store.SistemaWeb.repository.UsuarioRepository;
 import com.PC.Store.SistemaWeb.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<UsuarioResponseDTO> listarTodos() {
@@ -38,7 +42,24 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new BusinessException("Ya existe un usuario con el correo: " + dto.correo());
         }
         Usuario usuario = new Usuario();
-        mapToEntity(dto, usuario);
+        usuario.setNombre(dto.nombre());
+        usuario.setCorreo(dto.correo());
+        usuario.setPassword(passwordEncoder.encode(dto.password()));
+        usuario.setRol(dto.rol());
+        return toDTO(usuarioRepository.save(usuario));
+    }
+
+    @Override
+    @Transactional
+    public UsuarioResponseDTO registrarPublico(UsuarioRegistroRequestDTO dto) {
+        if (usuarioRepository.existsByCorreo(dto.correo())) {
+            throw new BusinessException("Ya existe un usuario con el correo: " + dto.correo());
+        }
+        Usuario usuario = new Usuario();
+        usuario.setNombre(dto.nombre());
+        usuario.setCorreo(dto.correo());
+        usuario.setPassword(passwordEncoder.encode(dto.password()));
+        usuario.setRol("CLIENTE");
         return toDTO(usuarioRepository.save(usuario));
     }
 
@@ -49,7 +70,10 @@ public class UsuarioServiceImpl implements UsuarioService {
         if (!usuario.getCorreo().equals(dto.correo()) && usuarioRepository.existsByCorreo(dto.correo())) {
             throw new BusinessException("Ya existe un usuario con el correo: " + dto.correo());
         }
-        mapToEntity(dto, usuario);
+        usuario.setNombre(dto.nombre());
+        usuario.setCorreo(dto.correo());
+        usuario.setPassword(passwordEncoder.encode(dto.password()));
+        usuario.setRol(dto.rol());
         return toDTO(usuarioRepository.save(usuario));
     }
 
@@ -70,16 +94,16 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuarioRepository.deleteAllById(ids);
     }
 
+    @Override
+    public Optional<UsuarioResponseDTO> autenticar(String correo, String password) {
+        return usuarioRepository.findByCorreo(correo)
+                .filter(u -> passwordEncoder.matches(password, u.getPassword()))
+                .map(this::toDTO);
+    }
+
     private Usuario findOrThrow(Integer id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", id));
-    }
-
-    private void mapToEntity(UsuarioRequestDTO dto, Usuario usuario) {
-        usuario.setNombre(dto.nombre());
-        usuario.setCorreo(dto.correo());
-        usuario.setPassword(dto.password());
-        usuario.setRol(dto.rol());
     }
 
     private UsuarioResponseDTO toDTO(Usuario u) {

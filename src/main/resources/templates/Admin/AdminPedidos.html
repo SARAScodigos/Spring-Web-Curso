@@ -2,19 +2,63 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/Admilayout :: base(~{::contenidoAdmin})}">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Pedidos - Admin</title>
 </head>
 <body>
-    <main th:fragment="contenidoAdmin">
-        <!-- Navbar -->
-        <nav class="navbar bg-white shadow-sm px-4">
-            <h4 class="mb-0">Panel de Administración</h4>
+<main th:fragment="contenidoAdmin">
+    <!-- Navbar -->
+    <nav class="navbar bg-white shadow-sm px-4">
+        <h4 class="mb-0">Pedidos</h4>
+        <div>
+            <span class="fw-bold">Administrador</span>
+        </div>
+    </nav>
 
-            <div>
-                <span class="fw-bold">Administrador</span>
-            </div>
-        </nav>
-        <!--Productos-->
-    </main>
+    <div class="p-4">
+        <div th:if="${#lists.isEmpty(pedidos)}" class="text-center text-muted py-5">
+            <i class="bi bi-inbox fs-1"></i>
+            <p class="mt-2">Todavía no hay pedidos registrados.</p>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(pedidos)}" class="table-responsive">
+            <table class="table table-hover align-middle bg-white shadow-sm rounded">
+                <thead class="table-light">
+                <tr>
+                    <th>N° Pedido</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Método de pago</th>
+                    <th>Productos</th>
+                    <th>Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="pedido : ${pedidos}">
+                    <td>#<span th:text="${pedido.idPedido}"></span></td>
+                    <td th:text="${pedido.nombreUsuario}"></td>
+                    <td th:text="${pedido.fechaRegistro}"></td>
+                    <td>
+                                <span th:if="${pedido.metodoPago == 'TARJETA'}" class="badge bg-primary">
+                                    <i class="bi bi-credit-card me-1"></i>Tarjeta
+                                </span>
+                        <span th:if="${pedido.metodoPago == 'BILLETERA'}" class="badge bg-success">
+                                    <i class="bi bi-wallet2 me-1"></i>Billetera
+                                </span>
+                    </td>
+                    <td>
+                        <ul class="mb-0 ps-3" style="font-size: .85rem;">
+                            <li th:each="detalle : ${pedido.detalles}">
+                                <span th:text="${detalle.nombreProducto}"></span>
+                                x<span th:text="${detalle.cantidad}"></span>
+                            </li>
+                        </ul>
+                    </td>
+                    <td class="fw-bold">S/ <span th:text="${pedido.total}"></span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
 </body>
 </html>

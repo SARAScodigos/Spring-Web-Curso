@@ -27,7 +27,7 @@
             <div class="carousel-inner">
 
                 <div class="carousel-item active">
-                    <img th:src="@{/img/carrusel1.PNG}" class="d-block w-100" alt="">
+                    <img th:src="@{/img/carrusel1.png}" class="d-block w-100" alt="Carrusel 1">
                     <div class="carousel-caption">
                     </div>
                 </div>
@@ -105,47 +105,46 @@
             </div>
         </section>
 
-        <section class="container my-5">
-            <h2 class="text-center mb-4">Productos Destacados</h2>
+        <section class="productos-destacados-section">
+            <div class="container">
+                <div class="section-heading">
+                    <span class="section-tag">Lo más vendido</span>
+                    <h2>Productos Destacados</h2>
+                    <p>Selección de los equipos favoritos de nuestros clientes</p>
+                </div>
 
-            <div class="row">
-
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow">
-                        <img th:src="@{/img/lapto.jpg}" class="card-img-top" alt="">
-                        <div class="card-body">
-                            <h5 class="card-title">Laptop Gamer</h5>
-                            <p class="card-text">Procesador Intel i7, 16GB RAM.</p>
-                            <h4>S/ 3,299</h4>
-                            <a href="#" class="btn btn-primary">Ver producto</a>
+                <div class="row" th:if="${not #lists.isEmpty(productosDestacados)}">
+                    <div class="col-md-4 mb-4" th:each="p : ${productosDestacados}">
+                        <div class="producto-card">
+                            <div class="producto-img-wrapper">
+                                <img th:src="${p.image != null && p.image != ''} ? @{'/img/' + ${p.image}} : @{/img/default.jpg}" alt="Producto">
+                                <span class="producto-badge" th:text="${p.nombreCategoria}"></span>
+                            </div>
+                            <div class="producto-body">
+                                <h5 th:text="${p.nombre}"></h5>
+                                <div class="producto-precio" th:text="'S/ ' + ${#numbers.formatDecimal(p.precio, 1, 2)}"></div>
+                                <button type="button" class="btn-agregar-carrito"
+                                        th:data-id="${p.idProducto}"
+                                        th:data-nombre="${p.nombre}"
+                                        th:data-precio="${p.precio}"
+                                        onclick="agregarAlCarritoDesdeBoton(this)">
+                                    <i class="bi bi-cart-plus"></i> Agregar al carrito
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow">
-                        <img th:src="@{/img/celular.JFIF}" class="card-img-top" alt="">
-                        <div class="card-body">
-                            <h5 class="card-title">Smartphone</h5>
-                            <p class="card-text">128GB almacenamiento.</p>
-                            <h4>S/ 1,599</h4>
-                            <a href="#" class="btn btn-primary">Ver producto</a>
-                        </div>
-                    </div>
+                <div th:if="${#lists.isEmpty(productosDestacados)}" class="sin-productos">
+                    <i class="bi bi-box-seam"></i>
+                    <p>Pronto tendremos productos disponibles</p>
                 </div>
 
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow">
-                        <img th:src="@{/img/audifonos.JFIF}" class="card-img-top" alt="">
-                        <div class="card-body">
-                            <h5 class="card-title">Audífonos Bluetooth</h5>
-                            <p class="card-text">Sonido premium.</p>
-                            <h4>S/ 199</h4>
-                            <a href="#" class="btn btn-primary">Ver producto</a>
-                        </div>
-                    </div>
+                <div class="text-center mt-4">
+                    <a th:href="@{/user/productos}" class="btn-ver-todos">
+                        Ver todos los productos <i class="bi bi-arrow-right"></i>
+                    </a>
                 </div>
-
             </div>
         </section>
 

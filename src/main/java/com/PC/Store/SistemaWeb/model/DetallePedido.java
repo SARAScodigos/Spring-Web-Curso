@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import jakarta.validation.constraints.Min;
 
 import java.math.BigDecimal;
 
@@ -24,7 +25,7 @@ public class DetallePedido {
     @JoinColumn(name = "id_producto", nullable = false)
     private Producto producto;
 
-    @Size(min = 1)
+    @Min(1)
     @Column(nullable = false)
     private Integer cantidad;
 
