@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formularios de Administración</title>
+</head>
+<body>
+
+<!-- ========================================================================= -->
+<!-- FRAGMENTO: FORMULARIO CREAR / EDITAR PRODUCTO (SERVER-SIDE MVC)           -->
+<!-- ========================================================================= -->
+<div th:fragment="adminCrearProductoForm(producto, categorias, productoId, actionActual)" class="card border-0 shadow-sm mb-4" style="border-radius: 16px; overflow: hidden; animation: fadeInUp 0.4s ease-out;">
+    <div class="card-header bg-dark text-white py-3">
+        <h5 class="mb-0 fw-bold d-flex align-items-center">
+            <i class="bi bi-box-seam-fill me-2 text-warning"></i>
+            <span th:text="${productoId != null} ? 'Editar Producto (ID: ' + ${productoId} + ')' : 'Nuevo Producto'">Registrar Producto</span>
+        </h5>
+    </div>
+    <div class="card-body p-4 bg-light">
+        <form th:action="@{/admin/productos/guardar}" th:object="${producto}" method="POST" enctype="multipart/form-data">
+            <!-- ID oculto para edición -->
+            <input type="hidden" name="idProducto" th:value="${productoId}">
+            
+            <div class="row g-3">
+                <!-- Nombre -->
+                <div class="col-md-6">
+                    <label for="prodNombre" class="form-label fw-bold text-secondary">Nombre del Producto</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-tag"></i></span>
+                        <input type="text" class="form-control bg-white border-start-0 ps-0" id="prodNombre" 
+                               th:field="*{nombre}" placeholder="Ej. Laptop Gaming Asus ROG" required
+                               th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid'">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}">El nombre es inválido.</div>
+                    </div>
+                </div>
+                
+                <!-- Categoría -->
+                <div class="col-md-6">
+                    <label for="prodCategoria" class="form-label fw-bold text-secondary">Categoría</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-folder"></i></span>
+                        <select class="form-select bg-white border-start-0 ps-0" id="prodCategoria" th:field="*{idCategoria}" required
+                                th:classappend="${#fields.hasErrors('idCategoria')} ? 'is-invalid'">
+                            <option value="">Seleccione una categoría...</option>
+                            <option th:each="cat : ${categorias}" 
+                                    th:value="${cat.idCategoria}" 
+                                    th:text="${cat.nombre}"></option>
+                        </select>
+                        <!-- Enlace para ir a crear categoría rápida -->
+                        <a th:href="@{/admin/productos(action='nuevaCategoria')}" class="btn btn-warning text-dark fw-bold d-flex align-items-center" title="Nueva Categoría">
+                            <i class="bi bi-plus-lg"></i>
+                        </a>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('idCategoria')}" th:errors="*{idCategoria}">La categoría es obligatoria.</div>
+                    </div>
+                </div>
+
+                <!-- Precio -->
+                <div class="col-md-4">
+                    <label for="prodPrecio" class="form-label fw-bold text-secondary">Precio (S/)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-cash-coin"></i></span>
+                        <input type="number" step="0.01" min="0.01" class="form-control bg-white border-start-0 ps-0" id="prodPrecio" 
+                               th:field="*{precio}" placeholder="0.00" required
+                               th:classappend="${#fields.hasErrors('precio')} ? 'is-invalid'">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('precio')}" th:errors="*{precio}">Precio inválido.</div>
+                    </div>
+                </div>
+
+                <!-- Stock -->
+                <div class="col-md-4">
+                    <label for="prodStock" class="form-label fw-bold text-secondary">Stock Inicial</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-stack"></i></span>
+                        <input type="number" min="0" class="form-control bg-white border-start-0 ps-0" id="prodStock" 
+                               th:field="*{stock}" placeholder="0" required
+                               th:classappend="${#fields.hasErrors('stock')} ? 'is-invalid'">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('stock')}" th:errors="*{stock}">Stock inválido.</div>
+                    </div>
+                </div>
+
+                <!-- Subir Imagen (Archivo) -->
+                <div class="col-md-4">
+                    <label for="prodImagenFile" class="form-label fw-bold text-secondary">Foto del Producto</label>
+                    <input type="file" class="form-control" id="prodImagenFile" name="imagenFile" accept="image/*">
+                    <div class="form-text text-muted">Seleccione una foto en formato JPG, PNG o JPEG.</div>
+                </div>
+
+                <!-- Vista previa e info de imagen existente -->
+                <div class="col-12" th:if="${productoId != null && producto.image != null && producto.image != ''}">
+                    <div class="d-flex align-items-center bg-white p-3 rounded border shadow-sm" style="max-width: 400px;">
+                        <img th:src="${#strings.startsWith(producto.image, 'http')} ? ${producto.image} : @{'/img/' + ${producto.image}}" 
+                             alt="Imagen actual" class="img-thumbnail me-3 object-fit-cover" style="width: 70px; height: 70px; border-radius: 8px;">
+                        <div>
+                            <div class="fw-bold small text-secondary">Imagen actual:</div>
+                            <code class="text-break small" th:text="${producto.image}"></code>
+                            <div class="text-muted small mt-1">Si no sube una foto nueva, se conservará la existente.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="mt-4 d-flex justify-content-end gap-2">
+                <a th:href="@{/admin/productos}" class="btn btn-light border px-4">Cancelar</a>
+                <button type="submit" class="btn btn-warning px-4 text-dark fw-bold">
+                    <i class="bi bi-save me-1"></i> Guardar Producto
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- ========================================================================= -->
+<!-- FRAGMENTO: FORMULARIO CREAR / EDITAR CATEGORÍA (SERVER-SIDE MVC)          -->
+<!-- ========================================================================= -->
+<div th:fragment="adminCrearCategoriaForm(categoria, categoriaId, actionActual)" class="card border-0 shadow-sm mb-4" style="border-radius: 16px; overflow: hidden; animation: fadeInUp 0.4s ease-out;">
+    <div class="card-header bg-dark text-white py-3">
+        <h5 class="mb-0 fw-bold d-flex align-items-center">
+            <i class="bi bi-tag-fill me-2 text-warning"></i>
+            <span th:text="${categoriaId != null} ? 'Editar Categoría (ID: ' + ${categoriaId} + ')' : 'Nueva Categoría'">Nueva Categoría</span>
+        </h5>
+    </div>
+    <div class="card-body p-4 bg-light">
+        <form th:action="@{/admin/categorias/guardar}" th:object="${categoria}" method="POST">
+            <!-- ID oculto para edición -->
+            <input type="hidden" name="idCategoria" th:value="${categoriaId}">
+            
+            <div class="row g-3">
+                <!-- Nombre -->
+                <div class="col-md-4">
+                    <label for="catNombre" class="form-label fw-bold text-secondary">Nombre de la Categoría</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-tag"></i></span>
+                        <input type="text" class="form-control bg-white border-start-0 ps-0" id="catNombre" 
+                               th:field="*{nombre}" placeholder="Ej. Accesorios, Monitores" required
+                               th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid'">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}">El nombre es inválido.</div>
+                    </div>
+                </div>
+
+                <!-- Descripción -->
+                <div class="col-md-8">
+                    <label for="catDescripcion" class="form-label fw-bold text-secondary">Descripción</label>
+                    <input type="text" class="form-control bg-white" id="catDescripcion" 
+                           th:field="*{descripcion}" placeholder="Escribe una breve descripción..." required
+                           th:classappend="${#fields.hasErrors('descripcion')} ? 'is-invalid'">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}">La descripción es inválida.</div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="mt-4 d-flex justify-content-end gap-2">
+                <a th:href="@{/admin/productos}" class="btn btn-light border px-4">Cancelar</a>
+                <button type="submit" class="btn btn-warning px-4 text-dark fw-bold">
+                    <i class="bi bi-save me-1"></i> Guardar Categoría
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

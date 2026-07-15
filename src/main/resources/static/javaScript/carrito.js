@@ -155,7 +155,12 @@ function confirmarPedido() {
         return;
     }
 
-    const metodoPago = document.querySelector('input[name="metodoPago"]:checked').value;
+    const metodoPagoSeleccionado = document.querySelector('input[name="metodoPago"]:checked');
+    if (!metodoPagoSeleccionado) {
+        mostrarToast('Por favor, selecciona un método de pago');
+        return;
+    }
+    const metodoPago = metodoPagoSeleccionado.value;
 
     const payload = {
         idUsuario: parseInt(usuarioId),

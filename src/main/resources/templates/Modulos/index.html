@@ -113,27 +113,7 @@
                     <p>Selección de los equipos favoritos de nuestros clientes</p>
                 </div>
 
-                <div class="row" th:if="${not #lists.isEmpty(productosDestacados)}">
-                    <div class="col-md-4 mb-4" th:each="p : ${productosDestacados}">
-                        <div class="producto-card">
-                            <div class="producto-img-wrapper">
-                                <img th:src="${p.image != null && p.image != ''} ? @{'/img/' + ${p.image}} : @{/img/default.jpg}" alt="Producto">
-                                <span class="producto-badge" th:text="${p.nombreCategoria}"></span>
-                            </div>
-                            <div class="producto-body">
-                                <h5 th:text="${p.nombre}"></h5>
-                                <div class="producto-precio" th:text="'S/ ' + ${#numbers.formatDecimal(p.precio, 1, 2)}"></div>
-                                <button type="button" class="btn-agregar-carrito"
-                                        th:data-id="${p.idProducto}"
-                                        th:data-nombre="${p.nombre}"
-                                        th:data-precio="${p.precio}"
-                                        onclick="agregarAlCarritoDesdeBoton(this)">
-                                    <i class="bi bi-cart-plus"></i> Agregar al carrito
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div th:replace="~{fragments/adminProducto :: publicProductGrid(${productosDestacados})}"></div>
 
                 <div th:if="${#lists.isEmpty(productosDestacados)}" class="sin-productos">
                     <i class="bi bi-box-seam"></i>

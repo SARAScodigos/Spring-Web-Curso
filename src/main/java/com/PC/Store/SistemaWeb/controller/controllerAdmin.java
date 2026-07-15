@@ -23,10 +23,6 @@ public class controllerAdmin {
         return "Admin/dashboard";
     }
 
-    @GetMapping("/productos")
-    public String AdminProductos(){
-        return "Admin/AdminProductos";
-    }
 
     @GetMapping("/pedidos")
     public String AdminPedidos(Model model){

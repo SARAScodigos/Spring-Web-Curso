@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Productos</title>
+</head>
+<body>
+
+<!-- ========================================================================= -->
+<!-- FRAGMENTO: GESTION COMPLETA DE PRODUCTOS Y CATEGORIAS (ADMINISTRADOR)     -->
+<!-- ========================================================================= -->
+<div th:fragment="adminGestionCompleta">
+    <link th:href="@{/css/adminProductos.css}" rel="stylesheet">
+
+    <!-- Mensajes de Retroalimentación del Servidor (Flash Attributes) -->
+    <div th:if="${exito}" class="alert alert-success alert-dismissible fade show border-0 shadow-lg mb-4" role="alert" 
+         style="border-radius: 12px; background-color: #10b981; color: white;">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-check-circle-fill me-3 fs-4 text-white"></i>
+            <div>
+                <strong class="d-block">Operación exitosa</strong>
+                <span th:text="${exito}">Mensaje de éxito</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show border-0 shadow-lg mb-4" role="alert" 
+         style="border-radius: 12px; background-color: #ef4444; color: white;">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill me-3 fs-4 text-white"></i>
+            <div>
+                <strong class="d-block">Aviso del sistema</strong>
+                <span th:text="${error}">Mensaje de error</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <!-- Renderizado condicional del Formulario de Productos (Creación / Edición) -->
+    <div th:if="${actionActual == 'nuevo' || actionActual == 'editar'}">
+        <div th:replace="~{fragments/adminCrearProductoForm :: adminCrearProductoForm(${producto}, ${categorias}, ${productoId}, ${actionActual})}"></div>
+    </div>
+
+    <!-- Renderizado condicional del Formulario de Categorías (Creación / Edición) -->
+    <div th:if="${actionActual == 'nuevaCategoria' || actionActual == 'editarCategoria'}">
+        <div th:replace="~{fragments/adminCrearProductoForm :: adminCrearCategoriaForm(${categoria}, ${categoriaId}, ${actionActual})}"></div>
+    </div>
+
+    <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+        <div class="card-header bg-white border-0 py-3 d-flex flex-wrap justify-content-between align-items-center">
+            <h5 class="mb-0 text-dark fw-bold">
+                <i class="bi bi-gear-fill text-warning me-2"></i>Panel de Control de Inventario
+            </h5>
+            <!-- Pestañas de Navegación (Bootstrap Tabs) -->
+            <ul class="nav nav-pills card-header-pills" id="adminTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold text-dark" id="productos-tab" data-bs-toggle="tab" data-bs-target="#productos-pane" type="button" role="tab" aria-controls="productos-pane" 
+                            th:classappend="${actionActual != 'nuevaCategoria' && actionActual != 'editarCategoria'} ? 'active' : ''"
+                            th:aria-selected="${actionActual != 'nuevaCategoria' && actionActual != 'editarCategoria'} ? 'true' : 'false'">
+                        <i class="bi bi-box-seam me-1"></i>Productos
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold text-dark" id="categorias-tab" data-bs-toggle="tab" data-bs-target="#categorias-pane" type="button" role="tab" aria-controls="categorias-pane" 
+                            th:classappend="${actionActual == 'nuevaCategoria' || actionActual == 'editarCategoria'} ? 'active' : ''"
+                            th:aria-selected="${actionActual == 'nuevaCategoria' || actionActual == 'editarCategoria'} ? 'true' : 'false'">
+                        <i class="bi bi-tags me-1"></i>Categorías
+                    </button>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="card-body p-4 bg-white">
+            <div class="tab-content" id="adminTabContent">
+                
+                <!-- PESTAÑA: PRODUCTOS -->
+                <div class="tab-pane fade" id="productos-pane" role="tabpanel" aria-labelledby="productos-tab" tabindex="0"
+                     th:classappend="${actionActual != 'nuevaCategoria' && actionActual != 'editarCategoria'} ? 'show active' : ''">
+                    
+                    <!-- Formulario de Filtros, Búsqueda y Ordenamiento (GET en Servidor) -->
+                    <form th:action="@{/admin/productos}" method="GET" class="row g-3 mb-4 align-items-center">
+                        <!-- Preservar modo formulario si está abierto -->
+                        <input type="hidden" name="action" th:value="${actionActual}">
+                        <input type="hidden" name="id" th:value="${productoId}">
+
+                        <div class="col-md-4">
+                            <div class="input-group shadow-sm rounded">
+                                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                                <input type="text" name="buscar" class="form-control bg-white border-start-0 ps-0" placeholder="Buscar por nombre..." th:value="${buscarActual}">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <select name="categoriaId" class="form-select shadow-sm" onchange="this.form.submit()">
+                                <option value="">Todas las categorías</option>
+                                <option th:each="c : ${categorias}" 
+                                        th:value="${c.idCategoria}" 
+                                        th:text="${c.nombre}"
+                                        th:selected="${c.idCategoria == categoriaIdActual}"></option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <select name="orden" class="form-select shadow-sm" onchange="this.form.submit()">
+                                <option value="">Ordenar por...</option>
+                                <option value="nombreAsc" th:selected="${ordenActual == 'nombreAsc'}">Nombre (A-Z)</option>
+                                <option value="nombreDesc" th:selected="${ordenActual == 'nombreDesc'}">Nombre (Z-A)</option>
+                                <option value="precioAsc" th:selected="${ordenActual == 'precioAsc'}">Precio: Menor a Mayor</option>
+                                <option value="precioDesc" th:selected="${ordenActual == 'precioDesc'}">Precio: Mayor a Menor</option>
+                                <option value="stockAsc" th:selected="${ordenActual == 'stockAsc'}">Stock: Menor a Mayor</option>
+                                <option value="stockDesc" th:selected="${ordenActual == 'stockDesc'}">Stock: Mayor a Menor</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3 text-end d-flex gap-2 justify-content-end">
+                            <button type="submit" class="btn btn-light border shadow-sm fw-bold">
+                                <i class="bi bi-funnel-fill me-1 text-warning"></i>Filtrar
+                            </button>
+                            <a th:href="@{/admin/productos(action='nuevo')}" class="btn btn-warning text-dark fw-bold shadow-sm">
+                                <i class="bi bi-plus-circle me-1"></i>Nuevo Producto
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Formulario para Eliminación en Lote -->
+                    <form th:action="@{/admin/productos/eliminar-seleccionados}" method="POST" id="formBatchProductos" onsubmit="return confirm('¿Está seguro de que desea eliminar los productos seleccionados?');">
+                        <div class="table-responsive rounded shadow-sm">
+                            <table class="table table-hover align-middle bg-white mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th width="40" class="text-center">
+                                            <input class="form-check-input" type="checkbox" id="checkTodos" 
+                                                   onclick="document.querySelectorAll('.check-producto').forEach(cb => cb.checked = this.checked)">
+                                        </th>
+                                        <th width="80">Imagen</th>
+                                        <th>Producto</th>
+                                        <th>Categoría</th>
+                                        <th class="text-end">Precio</th>
+                                        <th class="text-center">Stock</th>
+                                        <th class="text-center" width="120">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="p : ${productos}">
+                                        <td class="text-center">
+                                            <input class="form-check-input check-producto" type="checkbox" name="selectedIds" th:value="${p.idProducto}">
+                                        </td>
+                                        <td>
+                                            <!-- Validar tipo de imagen (URL externa o archivo subido local) -->
+                                            <img th:src="${p.image != null && p.image != ''} ? (${#strings.startsWith(p.image, 'http') || #strings.startsWith(p.image, '/')} ? ${p.image} : @{'/img/' + ${p.image}}) : @{/img/default.jpg}" 
+                                                 alt="Imagen" class="img-thumbnail object-fit-cover shadow-sm" style="width: 50px; height: 50px; border-radius: 8px;" onerror="this.src='/img/default.jpg'">
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold text-dark" th:text="${p.nombre}">Nombre</div>
+                                            <small class="text-muted">ID: <span th:text="${p.idProducto}"></span></small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary py-2 px-3 rounded-pill" th:text="${p.nombreCategoria}">Categoría</span>
+                                        </td>
+                                        <td class="text-end fw-bold text-dark" th:text="'S/ ' + ${#numbers.formatDecimal(p.precio, 1, 2)}">
+                                            S/ 0.00
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge py-1 px-2" style="font-size: 0.85rem;"
+                                                  th:classappend="${p.stock <= 5} ? 'bg-danger' : 'bg-success'"
+                                                  th:text="${p.stock} + ' unid.'">0 unid.</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <!-- Redirecciona prellenando el formulario de productos en modo edición -->
+                                                <a th:href="@{/admin/productos(action='editar', id=${p.idProducto}, buscar=${buscarActual}, categoriaId=${categoriaIdActual}, orden=${ordenActual})}" 
+                                                   class="btn btn-sm btn-outline-primary border-0" title="Editar">
+                                                    <i class="bi bi-pencil-square fs-5"></i>
+                                                </a>
+                                                <!-- Borrado mediante redirección -->
+                                                <a th:href="@{/admin/productos/eliminar/{id}(id=${p.idProducto})}" 
+                                                   class="btn btn-sm btn-outline-danger border-0" title="Eliminar"
+                                                   onclick="return confirm('¿Está seguro de que desea eliminar este producto?');">
+                                                    <i class="bi bi-trash3 fs-5"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(productos)}">
+                                        <td colspan="7" class="text-center py-4 text-muted">
+                                            <i class="bi bi-info-circle me-1"></i> No hay productos registrados con estas condiciones.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Barra inferior con botón de borrar lote -->
+                        <div class="mt-3 text-start" th:if="${not #lists.isEmpty(productos)}">
+                            <button type="submit" class="btn btn-outline-danger fw-bold shadow-sm">
+                                <i class="bi bi-trash3 me-1"></i>Eliminar seleccionados en lote
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- PESTAÑA: CATEGORIAS -->
+                <div class="tab-pane fade" id="categorias-pane" role="tabpanel" aria-labelledby="categorias-tab" tabindex="0"
+                     th:classappend="${actionActual == 'nuevaCategoria' || actionActual == 'editarCategoria'} ? 'show active' : ''">
+                    
+                    <!-- Barra de herramientas de Categorías (Botón de nueva categoría) -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="text-muted">
+                            <i class="bi bi-info-circle me-1"></i>Gestione las agrupaciones de productos de su tienda.
+                        </div>
+                        <a th:href="@{/admin/productos(action='nuevaCategoria')}" class="btn btn-warning text-dark fw-bold shadow-sm">
+                            <i class="bi bi-plus-circle me-1"></i>Nueva Categoría
+                        </a>
+                    </div>
+
+                    <form th:action="@{/admin/categorias/eliminar-seleccionados}" method="POST" onsubmit="return confirm('¿Eliminar las categorías seleccionadas?');">
+                        <div class="table-responsive rounded shadow-sm">
+                            <table class="table table-hover align-middle bg-white mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th width="40" class="text-center">
+                                            <input class="form-check-input" type="checkbox" id="checkTodosCat" 
+                                                   onclick="document.querySelectorAll('.check-categoria').forEach(cb => cb.checked = this.checked)">
+                                        </th>
+                                        <th width="80" class="text-center">ID</th>
+                                        <th width="200">Nombre</th>
+                                        <th>Descripción</th>
+                                        <th class="text-center" width="120">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="c : ${categorias}">
+                                        <td class="text-center">
+                                            <input class="form-check-input check-categoria" type="checkbox" name="selectedIds" th:value="${c.idCategoria}">
+                                        </td>
+                                        <td class="text-center fw-bold text-muted" th:text="${c.idCategoria}">1</td>
+                                        <td class="fw-bold text-dark" th:text="${c.nombre}">Categoría</td>
+                                        <td class="text-muted" th:text="${c.descripcion}">Descripción de la categoría</td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <a th:href="@{/admin/productos(action='editarCategoria', id=${c.idCategoria})}" 
+                                                   class="btn btn-sm btn-outline-primary border-0" title="Editar">
+                                                    <i class="bi bi-pencil-square fs-5"></i>
+                                                </a>
+                                                <a th:href="@{/admin/categorias/eliminar/{id}(id=${c.idCategoria})}" 
+                                                   class="btn btn-sm btn-outline-danger border-0" title="Eliminar"
+                                                   onclick="return confirm('¿Está seguro de que desea eliminar esta categoría? Si posee productos vinculados fallará.');">
+                                                    <i class="bi bi-trash3 fs-5"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(categorias)}">
+                                        <td colspan="5" class="text-center py-4 text-muted">
+                                            <i class="bi bi-info-circle me-1"></i> No hay categorías registradas.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-3 text-start" th:if="${not #lists.isEmpty(categorias)}">
+                            <button type="submit" class="btn btn-outline-danger fw-bold shadow-sm">
+                                <i class="bi bi-trash3 me-1"></i>Eliminar seleccionadas en lote
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================================================= -->
+<!-- FRAGMENTO: VISTA GENERAL DE PRODUCTOS EN CUADRÍCULA (PUBLICO/USER)        -->
+<!-- ========================================================================= -->
+<div th:fragment="publicProductGrid(productosList)" class="row">
+    <div class="col-md-4 mb-4" th:each="p : ${productosList}">
+        <div th:replace="~{fragments/adminProducto :: publicProductCard(${p})}"></div>
+    </div>
+    
+    <div th:if="${#lists.isEmpty(productosList)}" class="col-12 text-center text-muted py-5">
+        <i class="bi bi-box-seam fs-1 d-block mb-3"></i>
+        <p>No se encontraron productos disponibles con estas características.</p>
+    </div>
+</div>
+
+
+<!-- ========================================================================= -->
+<!-- FRAGMENTO: TARJETA DE PRODUCTO INDIVIDUAL (PUBLICO/USER)                 -->
+<!-- ========================================================================= -->
+<div th:fragment="publicProductCard(p)" class="producto-card h-100 shadow-sm border-0 transition-hover">
+    <div class="producto-img-wrapper position-relative overflow-hidden" style="border-radius: 12px 12px 0 0;">
+        <img th:src="${p.image != null && p.image != ''} ? (${#strings.startsWith(p.image, 'http') || #strings.startsWith(p.image, '/')} ? ${p.image} : @{'/img/' + ${p.image}}) : @{/img/default.jpg}" alt="Producto" class="img-fluid w-100 object-fit-cover" style="height: 200px;" onerror="this.src='/img/default.jpg'">
+        <span class="producto-badge position-absolute top-0 end-0 m-2 bg-dark text-white badge rounded-pill px-3 py-2 fw-normal" th:text="${p.nombreCategoria}"></span>
+    </div>
+    <div class="producto-body p-3">
+        <h5 class="card-title fw-bold text-dark text-truncate mb-1" th:text="${p.nombre}"></h5>
+        <p class="text-muted mb-2 small" th:text="${p.stock > 0} ? 'Disponibles: ' + ${p.stock} : 'Agotado'"></p>
+        <div class="producto-precio fw-bold fs-5 text-warning my-2" th:text="'S/ ' + ${#numbers.formatDecimal(p.precio, 1, 2)}"></div>
+        <button type="button" class="btn-agregar-carrito text-decoration-none border-0"
+                th:data-id="${p.idProducto}"
+                th:data-nombre="${p.nombre}"
+                th:data-precio="${p.precio}"
+                th:disabled="${p.stock <= 0}"
+                onclick="agregarAlCarritoDesdeBoton(this)">
+            <i class="bi bi-cart-plus-fill me-1"></i> 
+            <span th:text="${p.stock > 0} ? 'Agregar al carrito' : 'Sin Stock'">Agregar al carrito</span>
+        </button>
+    </div>
+</div>
+
+</body>
+</html>

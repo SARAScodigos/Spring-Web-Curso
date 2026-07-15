@@ -1,0 +1,126 @@
+/* Custom Styles for Admin Products & Categories Management */
+
+/* Fade-in animation for views */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tab-pane {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+/* Nav Pills Custom Styling */
+#adminTab .nav-link {
+    border-radius: 8px;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+#adminTab .nav-link:hover {
+    background-color: #f1f5f9;
+}
+
+#adminTab .nav-link.active {
+    background-color: #f97316 !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+}
+
+/* Table Enhancements */
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table th {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-bottom: none;
+    padding: 14px 16px;
+}
+
+.table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Custom Checkbox */
+.form-check-input:checked {
+    background-color: #f97316;
+    border-color: #f97316;
+}
+
+.form-check-input:focus {
+    border-color: #f97316;
+    box-shadow: 0 0 0 0.25rem rgba(249, 115, 22, 0.25);
+}
+
+/* Image Thumbnails in Tables */
+.img-thumbnail {
+    transition: transform 0.2s ease;
+}
+
+tr:hover .img-thumbnail {
+    transform: scale(1.1);
+}
+
+/* Form Controls with Glow Effects */
+.form-control:focus, .form-select:focus {
+    border-color: #f97316;
+    box-shadow: 0 0 0 0.25rem rgba(249, 115, 22, 0.15);
+}
+
+.input-group-text {
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.input-group:focus-within .input-group-text {
+    border-color: #f97316;
+    color: #f97316 !important;
+}
+
+/* Button Warning Enhancements */
+.btn-warning {
+    background-color: #f97316;
+    border-color: #f97316;
+    color: white !important;
+    transition: all 0.3s ease;
+}
+
+.btn-warning:hover, .btn-warning:focus, .btn-warning:active {
+    background-color: #ea580c !important;
+    border-color: #ea580c !important;
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3) !important;
+}
+
+/* Image Preview Box */
+.image-preview-container {
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1 !important;
+    transition: border-color 0.3s ease;
+}
+
+.image-preview-container:hover {
+    border-color: #f97316 !important;
+}
+
+/* Alerts container spacing */
+.alert {
+    animation: fadeInUp 0.3s ease-out;
+}

@@ -2,12 +2,21 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/Admilayout :: base(~{::contenidoAdmin})}">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Productos - Admin</title>
+    <link th:href="@{/css/adminProductos.css}" rel="stylesheet">
 </head>
 <body>
     <main th:fragment="contenidoAdmin">
-        <div>
-            <p>hola</p>
+        <!-- Navbar -->
+        <nav class="navbar bg-white shadow-sm px-4">
+            <h4 class="mb-0">Inventario de Tienda</h4>
+            <div>
+                <span class="fw-bold"><i class="bi bi-person-badge-fill text-warning me-1"></i>Administrador</span>
+            </div>
+        </nav>
+
+        <div class="p-4">
+            <div th:replace="~{fragments/adminProducto :: adminGestionCompleta}"></div>
         </div>
     </main>
 </body>
