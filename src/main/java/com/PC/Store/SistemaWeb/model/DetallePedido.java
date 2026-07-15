@@ -2,14 +2,18 @@ package com.PC.Store.SistemaWeb.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 
 @Setter
 @Getter
+@NoArgsConstructor
 @Entity
+
 
 public class DetallePedido {
     @Id

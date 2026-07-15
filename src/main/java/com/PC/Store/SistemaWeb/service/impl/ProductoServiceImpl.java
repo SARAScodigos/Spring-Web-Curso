@@ -5,8 +5,10 @@ import com.PC.Store.SistemaWeb.dto.producto.ProductoResponseDTO;
 import com.PC.Store.SistemaWeb.exception.BusinessException;
 import com.PC.Store.SistemaWeb.exception.ResourceNotFoundException;
 import com.PC.Store.SistemaWeb.model.Categoria;
+import com.PC.Store.SistemaWeb.model.DetallePedido;
 import com.PC.Store.SistemaWeb.model.Producto;
 import com.PC.Store.SistemaWeb.repository.CategoriaRepository;
+import com.PC.Store.SistemaWeb.repository.DetallePedidoRepository;
 import com.PC.Store.SistemaWeb.repository.ProductoRepository;
 import com.PC.Store.SistemaWeb.service.ProductoService;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +23,18 @@ public class ProductoServiceImpl implements ProductoService {
 
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
+    private final DetallePedidoRepository detallePedidoRepository;
 
     @Override
     public List<ProductoResponseDTO> listarTodos() {
         return productoRepository.findAll().stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    @Override
+    public List<ProductoResponseDTO> listarProductosBajoStock(int stock) {
+        return productoRepository.findByStockLessThanEqualOrderByStockAsc(stock).stream()
                 .map(this::toDTO)
                 .toList();
     }
@@ -59,9 +69,9 @@ public class ProductoServiceImpl implements ProductoService {
     public void eliminarPorId(Integer id) {
         Producto producto = findOrThrow(id);
         if (producto.getDetalles() != null && !producto.getDetalles().isEmpty()) {
-            throw new BusinessException("No se puede eliminar el producto porque está incluido en pedidos");
+            detallePedidoRepository.deleteAll(producto.getDetalles());
         }
-        productoRepository.deleteById(id);
+        productoRepository.delete(producto);
     }
 
     @Override
@@ -71,12 +81,19 @@ public class ProductoServiceImpl implements ProductoService {
         if (productos.size() != ids.size()) {
             throw new BusinessException("Uno o más productos no fueron encontrados");
         }
-        boolean tieneDetalles = productos.stream()
-                .anyMatch(p -> p.getDetalles() != null && !p.getDetalles().isEmpty());
-        if (tieneDetalles) {
-            throw new BusinessException("Uno o más productos están incluidos en pedidos y no pueden eliminarse");
+
+        for (Producto producto : productos) {
+            if (producto.getDetalles() != null && !producto.getDetalles().isEmpty()) {
+                detallePedidoRepository.deleteAll(producto.getDetalles());
+            }
         }
-        productoRepository.deleteAllById(ids);
+
+        productoRepository.deleteAll(productos);
+    }
+
+    @Override
+    public long contarProductos() {
+        return productoRepository.count();
     }
 
     private Producto findOrThrow(Integer id) {

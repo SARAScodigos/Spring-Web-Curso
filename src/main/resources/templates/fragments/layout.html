@@ -8,7 +8,7 @@
           integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
-    <link th:href="@{/css/estiloprincipal.css}" rel="stylesheet">
+    <link href="/css/estiloprincipal.css" th:href="@{/css/estiloprincipal.css}" rel="stylesheet">
     <title>PC Store</title>
 </head>
 
@@ -28,13 +28,17 @@
             <a href=""><i class="nav-icon bi bi-tools me-2"></i> Servicio tecnico</a>
         </nav>
     </div>
-    <div>
+    <div class="d-flex align-items-center gap-2">
+        <span th:if="${session.usuarioNombre != null}" class="fw-semibold text-dark">
+            Hola, <span th:text="${session.usuarioNombre}"></span>
+            <small class="d-block text-muted" th:text="${session.usuarioRol != null ? session.usuarioRol : 'Cliente'}"></small>
+        </span>
         <button class="cart-pill">
             <i class="bi bi-cart3"></i>
         </button>
-        <button class="btn-outline">
-            <i class="bi bi-person"></i>
-        </button>
+        <a th:href="@{/logout}" class="btn-outline text-decoration-none d-inline-flex align-items-center justify-content-center">
+            <i class="bi bi-box-arrow-right"></i>
+        </a>
     </div>
 </header>
 

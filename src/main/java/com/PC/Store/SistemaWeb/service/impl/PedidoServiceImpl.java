@@ -129,6 +129,11 @@ public class PedidoServiceImpl implements PedidoService {
         }
     }
 
+    @Override
+    public long contarPedidos() {
+        return pedidoRepository.count();
+    }
+
     private Pedido findOrThrow(Integer id) {
         return pedidoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Pedido", id));

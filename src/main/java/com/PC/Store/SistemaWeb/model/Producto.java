@@ -4,13 +4,17 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
 @Setter
 @Getter
+@NoArgsConstructor
+
 @Entity
 
 public class Producto {
@@ -36,6 +40,5 @@ public class Producto {
 
     @OneToMany(mappedBy = "producto")
     private List<DetallePedido> detalles;
-
 
 }

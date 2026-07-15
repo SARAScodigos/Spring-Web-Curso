@@ -87,12 +87,12 @@
                     <div class="col-md-4 mb-4"
                          th:each="p : ${productos}">
 
-                        <div class="card h-100 shadow-sm">
+                        <div class="card h-100 shadow-sm border-0">
 
-                            <!-- IMAGEN -->
-                            <img th:src="@{/img/default.jpg}"
+                            <img th:src="${p.image != null && !#strings.isEmpty(p.image)} ? ${p.image} : @{/img/celular.jfif}"
                                  class="card-img-top"
-                                 alt="Producto">
+                                 alt="Producto"
+                                 style="height:220px; object-fit:cover;">
 
                             <div class="card-body">
 
@@ -100,13 +100,14 @@
                                     th:text="${p.nombre}">
                                 </h5>
 
-                                <p class="card-text"
-                                   th:text="${p.categoria.nombre}">
+                                <p class="text-muted mb-2"
+                                   th:text="${p.nombreCategoria}">
                                 </p>
 
-                                <h4 th:text="'S/ ' + ${p.precio}"></h4>
+                                <h4 class="fw-bold" th:text="'S/ ' + ${#numbers.formatDecimal(p.precio, 1, 'POINT', 2, 'COMMA')}"></h4>
+                                <p class="text-muted" th:text="'Stock: ' + ${p.stock}"></p>
 
-                                <button class="btn btn-primary w-100">
+                                <button class="btn btn-dark w-100">
                                     Agregar al carrito
                                 </button>
 

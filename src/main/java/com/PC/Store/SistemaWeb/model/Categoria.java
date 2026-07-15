@@ -3,13 +3,16 @@ package com.PC.Store.SistemaWeb.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name="categoria")
 public class Categoria {
@@ -32,6 +35,8 @@ public class Categoria {
 
     @OneToMany(mappedBy = "categoria")
     private List<Producto> productos;
+
+
 
 
 }

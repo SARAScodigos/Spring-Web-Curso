@@ -2,13 +2,78 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/Admilayout :: base(~{::contenidoAdmin})}">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Dashboard</title>
 </head>
 <body>
-    <main th:fragment="contenidoAdmin" >
-        <div>
-            <p>hola</p>
+<main th:fragment="contenidoAdmin" class="p-4 content">
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Dashboard</h2>
+        <p class="text-muted mb-0">Resumen operativo de tu tienda.</p>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card card-dashboard p-4">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box me-3"><i class="bi bi-box-seam"></i></div>
+                    <div>
+                        <h6 class="text-muted mb-1">Productos</h6>
+                        <h3 class="fw-bold mb-0" th:text="${totalProductos}"></h3>
+                    </div>
+                </div>
+            </div>
         </div>
-    </main>
+        <div class="col-md-4">
+            <div class="card card-dashboard p-4">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box me-3"><i class="bi bi-people"></i></div>
+                    <div>
+                        <h6 class="text-muted mb-1">Usuarios</h6>
+                        <h3 class="fw-bold mb-0" th:text="${totalUsuarios}"></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-dashboard p-4">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box me-3"><i class="bi bi-cart-check"></i></div>
+                    <div>
+                        <h6 class="text-muted mb-1">Pedidos</h6>
+                        <h3 class="fw-bold mb-0" th:text="${totalPedidos}"></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-dashboard p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Productos con stock bajo</h5>
+            <span class="badge bg-warning text-dark">Alerta</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Stock</th>
+                    <th>Categoría</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="producto : ${productosBajoStock}">
+                    <td th:text="${producto.nombre}"></td>
+                    <td th:text="${producto.stock}"></td>
+                    <td th:text="${producto.nombreCategoria}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(productosBajoStock)}">
+                    <td colspan="3" class="text-muted text-center">No hay productos con stock bajo.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
 </body>
 </html>

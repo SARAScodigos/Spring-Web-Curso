@@ -7,6 +7,7 @@ import com.PC.Store.SistemaWeb.exception.ResourceNotFoundException;
 import com.PC.Store.SistemaWeb.model.Usuario;
 import com.PC.Store.SistemaWeb.repository.UsuarioRepository;
 import com.PC.Store.SistemaWeb.service.UsuarioService;
+import com.PC.Store.SistemaWeb.util.PasswordHashUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +45,30 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional
+    public UsuarioResponseDTO crearAdmin(UsuarioRequestDTO dto) {
+        if (usuarioRepository.existsByCorreo(dto.correo())) {
+            throw new BusinessException("Ya existe un usuario con el correo: " + dto.correo());
+        }
+        Usuario usuario = new Usuario();
+        usuario.setNombre(dto.nombre());
+        usuario.setCorreo(dto.correo());
+        usuario.setPassword(PasswordHashUtil.encode(dto.password()));
+        usuario.setRol("ADMIN");
+        return toDTO(usuarioRepository.save(usuario));
+    }
+
+    @Override
+    public UsuarioResponseDTO autenticar(String correo, String password) {
+        Usuario usuario = usuarioRepository.findByCorreo(correo)
+                .orElseThrow(() -> new BusinessException("Credenciales inválidas"));
+        if (!PasswordHashUtil.matches(password, usuario.getPassword())) {
+            throw new BusinessException("Credenciales inválidas");
+        }
+        return toDTO(usuario);
+    }
+
+    @Override
+    @Transactional
     public UsuarioResponseDTO actualizar(Integer id, UsuarioRequestDTO dto) {
         Usuario usuario = findOrThrow(id);
         if (!usuario.getCorreo().equals(dto.correo()) && usuarioRepository.existsByCorreo(dto.correo())) {
@@ -70,6 +95,11 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuarioRepository.deleteAllById(ids);
     }
 
+    @Override
+    public long contarUsuarios() {
+        return usuarioRepository.count();
+    }
+
     private Usuario findOrThrow(Integer id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", id));
@@ -78,8 +108,8 @@ public class UsuarioServiceImpl implements UsuarioService {
     private void mapToEntity(UsuarioRequestDTO dto, Usuario usuario) {
         usuario.setNombre(dto.nombre());
         usuario.setCorreo(dto.correo());
-        usuario.setPassword(dto.password());
-        usuario.setRol(dto.rol());
+        usuario.setPassword(PasswordHashUtil.encode(dto.password()));
+        usuario.setRol(dto.rol() == null || dto.rol().isBlank() ? "USER" : dto.rol());
     }
 
     private UsuarioResponseDTO toDTO(Usuario u) {

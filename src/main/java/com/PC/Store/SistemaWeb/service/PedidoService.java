@@ -12,4 +12,5 @@ public interface PedidoService {
     PedidoResponseDTO crear(PedidoRequestDTO dto);
     void eliminarPorId(Integer id);
     void eliminarPorIds(List<Integer> ids);
+    long contarPedidos();
 }

@@ -2,19 +2,45 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/Admilayout :: base(~{::contenidoAdmin})}">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Pedidos</title>
 </head>
 <body>
-    <main th:fragment="contenidoAdmin">
-        <!-- Navbar -->
-        <nav class="navbar bg-white shadow-sm px-4">
-            <h4 class="mb-0">Panel de Administración</h4>
+<main th:fragment="contenidoAdmin" class="p-4 content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Pedidos</h2>
+            <p class="text-muted mb-0">Historial de pedidos realizados en la tienda.</p>
+        </div>
+    </div>
 
-            <div>
-                <span class="fw-bold">Administrador</span>
-            </div>
-        </nav>
-        <!--Productos-->
-    </main>
+    <div class="card card-dashboard p-4">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Total</th>
+                    <th>Detalles</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="pedido : ${pedidos}">
+                    <td th:text="${pedido.idPedido}"></td>
+                    <td th:text="${pedido.fechaRegistro}"></td>
+                    <td th:text="${pedido.nombreUsuario}"></td>
+                    <td th:text="${#numbers.formatDecimal(pedido.total, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td>
+                        <ul class="mb-0 ps-3">
+                            <li th:each="detalle : ${pedido.detalles}" th:text="${detalle.nombreProducto + ' x' + detalle.cantidad}"></li>
+                        </ul>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
 </body>
 </html>

@@ -109,43 +109,18 @@
             <h2 class="text-center mb-4">Productos Destacados</h2>
 
             <div class="row">
-
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow">
-                        <img th:src="@{/img/lapto.jpg}" class="card-img-top" alt="">
+                <div class="col-md-4 mb-4" th:each="producto : ${productos}">
+                    <div class="card h-100 shadow-sm border-0">
+                        <img th:src="${producto.image != null && !#strings.isEmpty(producto.image)} ? ${producto.image} : @{/img/celular.jfif}" class="card-img-top" alt="Producto" style="height:220px; object-fit:cover;">
                         <div class="card-body">
-                            <h5 class="card-title">Laptop Gamer</h5>
-                            <p class="card-text">Procesador Intel i7, 16GB RAM.</p>
-                            <h4>S/ 3,299</h4>
-                            <a href="#" class="btn btn-primary">Ver producto</a>
+                            <h5 class="card-title" th:text="${producto.nombre}"></h5>
+                            <p class="text-muted mb-2" th:text="${producto.nombreCategoria}"></p>
+                            <h4 class="fw-bold" th:text="'S/ ' + ${#numbers.formatDecimal(producto.precio, 1, 'POINT', 2, 'COMMA')}"></h4>
+                            <p class="text-muted" th:text="'Stock: ' + ${producto.stock}"></p>
+                            <a th:href="@{/user/productos}" class="btn btn-dark w-100">Ver producto</a>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow">
-                        <img th:src="@{/img/celular.JFIF}" class="card-img-top" alt="">
-                        <div class="card-body">
-                            <h5 class="card-title">Smartphone</h5>
-                            <p class="card-text">128GB almacenamiento.</p>
-                            <h4>S/ 1,599</h4>
-                            <a href="#" class="btn btn-primary">Ver producto</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow">
-                        <img th:src="@{/img/audifonos.JFIF}" class="card-img-top" alt="">
-                        <div class="card-body">
-                            <h5 class="card-title">Audífonos Bluetooth</h5>
-                            <p class="card-text">Sonido premium.</p>
-                            <h4>S/ 199</h4>
-                            <a href="#" class="btn btn-primary">Ver producto</a>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </section>
 

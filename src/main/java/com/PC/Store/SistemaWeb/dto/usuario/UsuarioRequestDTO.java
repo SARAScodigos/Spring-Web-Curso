@@ -1,6 +1,5 @@
 package com.PC.Store.SistemaWeb.dto.usuario;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -11,7 +10,6 @@ public record UsuarioRequestDTO(
         String nombre,
 
         @NotBlank(message = "El correo es obligatorio")
-        @Email(message = "El correo no tiene un formato válido")
         String correo,
 
         @NotBlank(message = "La contraseña es obligatoria")

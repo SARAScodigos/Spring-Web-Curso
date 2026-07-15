@@ -2,13 +2,63 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/Admilayout :: base(~{::contenidoAdmin})}">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Usuarios</title>
 </head>
 <body>
-    <main th:fragment="contenidoAdmin">
+<main th:fragment="contenidoAdmin" class="p-4 content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <p>hola</p>
+            <h2 class="fw-bold mb-1">Usuarios</h2>
+            <p class="text-muted mb-0">Consulta los usuarios registrados en la tienda.</p>
         </div>
-    </main>
+    </div>
+
+    <div class="card card-dashboard p-4 mb-4">
+        <h5 class="mb-3">Crear administrador</h5>
+        <form th:action="@{/admin/usuarios/admin}" method="post" th:object="${adminForm}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" class="form-control" th:field="*{nombre}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Correo</label>
+                    <input type="email" class="form-control" th:field="*{correo}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" th:field="*{password}" required>
+                </div>
+                <input type="hidden" th:field="*{rol}">
+                <div class="col-12">
+                    <button class="btn btn-dark" type="submit">Guardar administrador</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="card card-dashboard p-4">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="usuario : ${usuarios}">
+                    <td th:text="${usuario.idUsuario}"></td>
+                    <td th:text="${usuario.nombre}"></td>
+                    <td th:text="${usuario.correo}"></td>
+                    <td th:text="${usuario.rol}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
 </body>
 </html>
