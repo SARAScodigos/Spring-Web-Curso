@@ -6,19 +6,19 @@
 </head>
 <body>
     <main th:fragment="contenido" class="container my-5">
-        <div class="row g-4">
+        <!-- Todo envuelto en un único formulario para unificar los filtros -->
+        <form th:action="@{/user/productos}" method="get" id="filterForm">
+            <div class="row g-4">
 
-            <!-- ================= COLUMNA FILTROS (Sidebar) ================= -->
-            <div class="col-lg-3 col-md-4 mb-4">
-                <!-- Usar el fragmento reutilizable de filtros -->
-                <div th:replace="~{fragments/components :: filtrosSidebar(${categorias})}"></div>
-            </div>
+                <!-- ================= COLUMNA FILTROS (Sidebar) ================= -->
+                <div class="col-lg-3 col-md-4 mb-4">
+                    <div th:replace="~{fragments/components :: filtrosSidebar(${categorias})}"></div>
+                </div>
 
-            <!-- ================= COLUMNA PRODUCTOS ================= -->
-            <div class="col-lg-9 col-md-8">
+                <!-- ================= COLUMNA PRODUCTOS ================= -->
+                <div class="col-lg-9 col-md-8">
 
-                <!-- Buscador y Ordenación -->
-                <form th:action="@{/user/productos}" method="get">
+                    <!-- Buscador y Ordenación -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-8">
                             <div class="input-group shadow-sm rounded">
@@ -26,39 +26,80 @@
                                 <input type="text"
                                        name="buscar"
                                        class="form-control border-0 py-2"
-                                       placeholder="Buscar productos por nombre...">
+                                       placeholder="Buscar productos por nombre..."
+                                       th:value="${param.buscar != null ? param.buscar : ''}">
                             </div>
                         </div>
 
                         <div class="col-md-4">
-                            <select class="form-select border-0 shadow-sm py-2" name="orden">
+                            <select class="form-select border-0 shadow-sm py-2" name="orden" id="ordenSelect">
                                 <option value="">Ordenar por</option>
-                                <option value="menor">Menor precio</option>
-                                <option value="mayor">Mayor precio</option>
-                                <option value="vendidos">Más vendidos</option>
-                                <option value="recientes">Más recientes</option>
+                                <option value="menor" th:selected="${#strings.equals(param.orden, 'menor')}">Menor precio</option>
+                                <option value="mayor" th:selected="${#strings.equals(param.orden, 'mayor')}">Mayor precio</option>
+                                <option value="vendidos" th:selected="${#strings.equals(param.orden, 'vendidos')}">Más vendidos</option>
+                                <option value="recientes" th:selected="${#strings.equals(param.orden, 'recientes')}">Más recientes</option>
                             </select>
                         </div>
                     </div>
-                </form>
 
-                <!-- Grid de Productos Dinámicos -->
-                <div class="row g-4">
-                    <div class="col-lg-4 col-md-6" th:each="p : ${productos}">
-                        <!-- Inserta la tarjeta de producto con el botón de agregar al carrito (isCatalog = true) -->
-                        <div th:replace="~{fragments/components :: productoCard(${p}, true)}"></div>
+                    <!-- Grid de Productos Dinámicos -->
+                    <div class="row g-4">
+                        <div class="col-lg-4 col-md-6" th:each="p : ${productos}">
+                            <!-- Inserta la tarjeta de producto (isCatalog = true) -->
+                            <div th:replace="~{fragments/components :: productoCard(${p}, true)}"></div>
+                        </div>
+
+                        <!-- Mensaje si la lista de productos está vacía -->
+                        <div th:if="${#lists.isEmpty(productos)}" class="col-12 text-center py-5">
+                            <i class="bi bi-search-heart text-muted display-2 d-block mb-3"></i>
+                            <p class="text-muted lead">No encontramos ningún producto para mostrar con los filtros seleccionados.</p>
+                        </div>
                     </div>
 
-                    <!-- Mensaje si la lista de productos está vacía -->
-                    <div th:if="${#lists.isEmpty(productos)}" class="col-12 text-center py-5">
-                        <i class="bi bi-search-heart text-muted display-2 d-block mb-3"></i>
-                        <p class="text-muted lead">No encontramos ningún producto para mostrar en este momento.</p>
-                    </div>
                 </div>
 
             </div>
+        </form>
 
-        </div>
+        <!-- JavaScript para filtrado dinámico en tiempo real -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const form = document.getElementById("filterForm");
+                const priceRange = document.getElementById("priceRange");
+                const priceVal = document.getElementById("priceVal");
+                const checkboxes = document.querySelectorAll(".filter-checkbox");
+                const ordenSelect = document.getElementById("ordenSelect");
+
+                // Actualizar el texto del precio máximo en tiempo real
+                if (priceRange && priceVal) {
+                    const formatPrice = (val) => "S/ " + Number(val).toLocaleString('es-PE');
+                    priceVal.textContent = formatPrice(priceRange.value);
+                    
+                    priceRange.addEventListener("input", function() {
+                        priceVal.textContent = formatPrice(this.value);
+                    });
+
+                    // Enviar formulario cuando el usuario suelte la barra deslizadora
+                    priceRange.addEventListener("change", function() {
+                        form.submit();
+                    });
+                }
+
+                // Enviar formulario al marcar/desmarcar categorías
+                checkboxes.forEach(cb => {
+                    cb.addEventListener("change", function() {
+                        form.submit();
+                    });
+                });
+
+                // Enviar formulario al cambiar la ordenación
+                if (ordenSelect) {
+                    ordenSelect.addEventListener("change", function() {
+                        form.submit();
+                    });
+                }
+            });
+        </script>
     </main>
 </body>
 </html>

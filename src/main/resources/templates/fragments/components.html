@@ -138,15 +138,19 @@
             <h6 class="fw-bold mb-3">Categorías</h6>
             <!-- CATEGORÍAS DINÁMICAS -->
             <div th:each="c : ${categorias}" class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" th:value="${c.idCategoria}" name="categorias" th:id="'cat-' + ${c.idCategoria}">
+                <input class="form-check-input filter-checkbox" type="checkbox" th:value="${c.idCategoria}" name="categorias" th:id="'cat-' + ${c.idCategoria}"
+                       th:checked="${param.categorias != null && #lists.contains(param.categorias, c.idCategoria.toString())}">
                 <label class="form-check-label text-muted" th:for="'cat-' + ${c.idCategoria}" th:text="${c.nombre}"></label>
             </div>
             <div th:if="${#lists.isEmpty(categorias)}" class="text-muted small py-2">
                 No hay categorías registradas.
             </div>
             <hr class="my-4">
-            <h6 class="fw-bold mb-3">Precio Máximo</h6>
-            <input type="range" class="form-range" min="0" max="5000" step="50" id="priceRange" value="5000">
+            <h6 class="fw-bold mb-3 d-flex justify-content-between">
+                <span>Precio Máximo</span>
+                <span id="priceVal" class="text-primary fw-semibold">S/ 5,000</span>
+            </h6>
+            <input type="range" class="form-range" min="0" max="5000" step="50" id="priceRange" name="precioMax" th:value="${param.precioMax != null ? param.precioMax : 5000}">
             <div class="d-flex justify-content-between text-muted small mt-1">
                 <span>S/ 0</span>
                 <span>S/ 5,000</span>
