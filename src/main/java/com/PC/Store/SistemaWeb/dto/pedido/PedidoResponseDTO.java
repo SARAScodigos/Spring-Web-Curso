@@ -10,6 +10,7 @@ public record PedidoResponseDTO(
         Integer idPedido,
         LocalDate fechaRegistro,
         BigDecimal total,
+        String metodoPago,
         Integer idUsuario,
         String nombreUsuario,
         List<DetallePedidoResponseDTO> detalles

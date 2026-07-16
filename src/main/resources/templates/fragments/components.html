@@ -97,7 +97,13 @@
             
             <div class="mt-auto pt-2">
                 <!-- Si es vista de catálogo, permite añadir al carrito -->
-                <button th:if="${isCatalog}" class="btn btn-dark w-100 py-2" style="border-radius: 10px;">
+                <button th:if="${isCatalog}" class="btn btn-dark w-100 py-2" style="border-radius: 10px;"
+                        th:data-id="${p.idProducto}"
+                        th:data-nombre="${p.nombre}"
+                        th:data-precio="${p.precio}"
+                        th:data-image="${p.image != null && !#strings.isEmpty(p.image) ? p.image : '/img/celular.jfif'}"
+                        th:data-stock="${p.stock}"
+                        onclick="agregarAlCarrito(this)">
                     <i class="bi bi-cart-plus me-1"></i> Agregar al carrito
                 </button>
                 <!-- Si es vista home, redirige a ver catálogo -->

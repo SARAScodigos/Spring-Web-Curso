@@ -34,8 +34,9 @@
             Hola, <span th:text="${session.usuarioNombre}"></span>
             <small class="d-block text-muted" th:text="${session.usuarioRol != null ? session.usuarioRol : 'Cliente'}"></small>
         </span>
-        <button class="cart-pill">
+        <button class="cart-pill d-flex align-items-center justify-content-center gap-1" data-bs-toggle="modal" data-bs-target="#carritoModal">
             <i class="bi bi-cart3"></i>
+            <span id="cart-count" class="badge bg-danger rounded-circle d-none" style="font-size: 0.7rem; padding: 0.25em 0.5em;">0</span>
         </button>
         <a th:href="@{/logout}" class="btn-outline text-decoration-none d-inline-flex align-items-center justify-content-center">
             <i class="bi bi-box-arrow-right"></i>
@@ -90,7 +91,252 @@
 
     </div>
 </footer>
+<!-- Modal del Carrito -->
+<div class="modal fade" id="carritoModal" tabindex="-1" aria-labelledby="carritoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header bg-dark text-white py-3" style="border-radius: 20px 20px 0 0; background-color: #111827 !important;">
+                <h5 class="modal-title fw-bold" id="carritoModalLabel">
+                    <i class="bi bi-cart3 me-2"></i>Tu Carrito de Compras
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" style="max-height: 60vh; overflow-y: auto;">
+                <!-- Lista de productos -->
+                <div id="cart-items-container">
+                    <!-- Dinámico por JS -->
+                </div>
+                <div id="cart-empty-message" class="text-center py-5 d-none">
+                    <i class="bi bi-cart-x text-muted display-1 d-block mb-3"></i>
+                    <p class="text-muted lead">Tu carrito está vacío.</p>
+                    <button type="button" class="btn btn-outline-dark mt-2" data-bs-dismiss="modal" style="border-radius: 10px;">Explorar productos</button>
+                </div>
+            </div>
+            <div class="modal-footer bg-light p-4 justify-content-between" style="border-radius: 0 0 20px 20px;">
+                <div>
+                    <h5 class="fw-bold mb-0 text-muted small">Total a pagar:</h5>
+                    <h3 class="fw-bold text-primary mb-0" id="cart-total-price">S/ 0.00</h3>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary py-2 px-3" data-bs-dismiss="modal" style="border-radius: 10px;">Seguir comprando</button>
+                    <!-- Si está logueado -->
+                    <button th:if="${session.usuarioId != null}" type="button" class="btn btn-dark py-2 px-4" id="btn-checkout" onclick="realizarCompra()" style="border-radius: 10px; background-color: #111827; border: 0;">
+                        <i class="bi bi-credit-card me-1"></i> Comprar ahora
+                    </button>
+                    <!-- Si no está logueado -->
+                    <a th:unless="${session.usuarioId != null}" th:href="@{/}" class="btn btn-warning py-2 px-4 fw-bold" style="border-radius: 10px;">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión para comprar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<script th:inline="javascript">
+    const sessionUsuarioId = [[${session.usuarioId}]];
+    
+    // Inicializar el carrito desde localStorage
+    let carrito = JSON.parse(localStorage.getItem('pc_store_cart')) || [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+        actualizarContadores();
+        renderizarCarrito();
+    });
+
+    function actualizarContadores() {
+        const cartCountBadge = document.getElementById("cart-count");
+        if (cartCountBadge) {
+            const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+            cartCountBadge.textContent = totalItems;
+            if (totalItems > 0) {
+                cartCountBadge.classList.remove("d-none");
+            } else {
+                cartCountBadge.classList.add("d-none");
+            }
+        }
+    }
+
+    function renderizarCarrito() {
+        const container = document.getElementById("cart-items-container");
+        const emptyMsg = document.getElementById("cart-empty-message");
+        const totalText = document.getElementById("cart-total-price");
+        const btnCheckout = document.getElementById("btn-checkout");
+
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        if (carrito.length === 0) {
+            emptyMsg.classList.remove("d-none");
+            totalText.textContent = "S/ 0.00";
+            if (btnCheckout) btnCheckout.disabled = true;
+            return;
+        }
+
+        emptyMsg.classList.add("d-none");
+        if (btnCheckout) btnCheckout.disabled = false;
+
+        let total = 0;
+
+        carrito.forEach((item, index) => {
+            const subtotal = item.precio * item.cantidad;
+            total += subtotal;
+
+            const itemHtml = `
+                <div class="row align-items-center mb-3 pb-3 border-bottom g-2">
+                    <div class="col-3 col-sm-2 col-md-1 text-center">
+                        <img src="${item.image}" class="img-fluid rounded" alt="${item.nombre}" style="max-height: 50px; width: 50px; object-fit: cover;">
+                    </div>
+                    <div class="col-9 col-sm-5 col-md-5">
+                        <h6 class="fw-bold mb-0 text-truncate" title="${item.nombre}">${item.nombre}</h6>
+                        <span class="text-muted small">Precio: S/ ${Number(item.precio).toFixed(2)}</span>
+                    </div>
+                    <div class="col-6 col-sm-3 col-md-3">
+                        <div class="input-group input-group-sm" style="max-width: 100px;">
+                            <button class="btn btn-outline-secondary py-0" type="button" onclick="cambiarCantidad(${index}, -1)">-</button>
+                            <input type="text" class="form-control text-center py-0" value="${item.cantidad}" readonly style="background: white;">
+                            <button class="btn btn-outline-secondary py-0" type="button" onclick="cambiarCantidad(${index}, 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="col-4 col-sm-2 col-md-2 text-end">
+                        <span class="fw-bold text-dark">S/ ${subtotal.toFixed(2)}</span>
+                    </div>
+                    <div class="col-2 col-sm-1 col-md-1 text-end">
+                        <button class="btn btn-sm btn-outline-danger border-0" onclick="eliminarDelCarrito(${index})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += itemHtml;
+        });
+
+        totalText.textContent = "S/ " + total.toFixed(2);
+    }
+
+    function agregarAlCarrito(btn) {
+        const id = parseInt(btn.getAttribute("data-id"));
+        const nombre = btn.getAttribute("data-nombre");
+        const precio = parseFloat(btn.getAttribute("data-precio"));
+        const image = btn.getAttribute("data-image");
+        const stock = parseInt(btn.getAttribute("data-stock"));
+
+        if (stock <= 0) {
+            alert("Este producto no cuenta con stock disponible.");
+            return;
+        }
+
+        const itemExistente = carrito.find(item => item.idProducto === id);
+
+        if (itemExistente) {
+            if (itemExistente.cantidad >= stock) {
+                alert("No puedes agregar más unidades de las disponibles en stock (" + stock + ").");
+                return;
+            }
+            itemExistente.cantidad++;
+        } else {
+            carrito.push({
+                idProducto: id,
+                nombre: nombre,
+                precio: precio,
+                image: image,
+                cantidad: 1,
+                stock: stock
+            });
+        }
+
+        localStorage.setItem('pc_store_cart', JSON.stringify(carrito));
+        actualizarContadores();
+        renderizarCarrito();
+
+        alert("¡Producto '" + nombre + "' agregado al carrito!");
+    }
+
+    function cambiarCantidad(index, delta) {
+        const item = carrito[index];
+        const nuevaCantidad = item.cantidad + delta;
+
+        if (nuevaCantidad < 1) {
+            eliminarDelCarrito(index);
+            return;
+        }
+
+        if (nuevaCantidad > item.stock) {
+            alert("No hay suficiente stock para añadir más unidades (disponibles: " + item.stock + ").");
+            return;
+        }
+
+        item.cantidad = nuevaCantidad;
+        localStorage.setItem('pc_store_cart', JSON.stringify(carrito));
+        actualizarContadores();
+        renderizarCarrito();
+    }
+
+    function eliminarDelCarrito(index) {
+        carrito.splice(index, 1);
+        localStorage.setItem('pc_store_cart', JSON.stringify(carrito));
+        actualizarContadores();
+        renderizarCarrito();
+    }
+
+    function realizarCompra() {
+        if (carrito.length === 0) return;
+        if (!sessionUsuarioId) {
+            alert("Debes iniciar sesión para realizar la compra.");
+            return;
+        }
+
+        const detalles = carrito.map(item => ({
+            idProducto: item.idProducto,
+            cantidad: item.cantidad
+        }));
+
+        const payload = {
+            idUsuario: sessionUsuarioId,
+            metodoPago: "Tarjeta (Simulado)",
+            detalles: detalles
+        };
+
+        const btnCheckout = document.getElementById("btn-checkout");
+        btnCheckout.disabled = true;
+        btnCheckout.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Procesando...';
+
+        fetch('/api/v1/pedidos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || "Error al procesar el pedido."); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            carrito = [];
+            localStorage.removeItem('pc_store_cart');
+            actualizarContadores();
+            renderizarCarrito();
+
+            const modalElement = document.getElementById("carritoModal");
+            const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+            modalInstance.hide();
+
+            alert("¡Compra simulada con éxito! Tu pedido #" + data.idPedido + " ha sido registrado.");
+            window.location.reload();
+        })
+        .catch(err => {
+            alert("Error: " + err.message);
+            btnCheckout.disabled = false;
+            btnCheckout.innerHTML = '<i class="bi bi-credit-card me-1"></i> Comprar ahora';
+        });
+    }
+</script>
 
 </body>
 

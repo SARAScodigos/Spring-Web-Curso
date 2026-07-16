@@ -30,6 +30,9 @@ public class Pedido {
             scale = 2)
     private BigDecimal total;
 
+    @Column(name = "metodo_pago", nullable = false)
+    private String metodoPago;
+
     @ManyToOne
     @JoinColumn(name = "id_Usuario", nullable = false)
     private Usuario usuario;
