@@ -16,7 +16,7 @@
 
     <div class="card card-dashboard p-4 mb-4">
         <h5 class="mb-3" th:text="${modoEdicion} ? 'Editar producto' : 'Nuevo producto'"></h5>
-        <form th:action="${modoEdicion} ? @{/admin/productos/{id}/editar(id=${productoId})} : @{/admin/productos}" method="post" th:object="${productoForm}">
+        <form th:action="${modoEdicion} ? @{/admin/productos/{id}/editar(id=${productoId})} : @{/admin/productos}" method="post" th:object="${productoForm}" enctype="multipart/form-data">
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Nombre</label>
@@ -31,8 +31,12 @@
                     <input type="number" class="form-control" th:field="*{stock}" required>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Imagen</label>
-                    <input type="text" class="form-control" th:field="*{image}">
+                    <label class="form-label d-flex align-items-center justify-content-between">
+                        <span>Imagen</span>
+                        <img th:if="*{image != null && !#strings.isEmpty(image)}" th:src="*{image}" class="rounded border" style="height: 24px; width: 24px; object-fit: cover;">
+                    </label>
+                    <input type="file" name="imagenFile" class="form-control" accept="image/*">
+                    <input type="hidden" th:field="*{image}">
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Categoría</label>

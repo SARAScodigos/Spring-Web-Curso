@@ -13,6 +13,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/admin")
@@ -44,14 +51,33 @@ public class controllerAdmin {
     @PostMapping("/productos")
     public String guardarProducto(@ModelAttribute("productoForm") @Valid ProductoRequestDTO productoForm,
                                   BindingResult result,
+                                  @RequestParam(value = "imagenFile", required = false) MultipartFile imagenFile,
                                   Model model) {
+        String imagePath = null;
+        try {
+            if (imagenFile != null && !imagenFile.isEmpty()) {
+                imagePath = saveImage(imagenFile);
+            }
+        } catch (Exception e) {
+            result.rejectValue("image", "error.image", e.getMessage());
+        }
+
         if (result.hasErrors()) {
             model.addAttribute("productos", productoService.listarTodos());
             model.addAttribute("categorias", categoriaService.listarTodos());
             return "Admin/AdminProductos";
         }
 
-        productoService.crear(productoForm);
+        // Create a new DTO containing the saved image path
+        ProductoRequestDTO dto = new ProductoRequestDTO(
+                productoForm.nombre(),
+                productoForm.precio(),
+                productoForm.stock(),
+                imagePath,
+                productoForm.idCategoria()
+        );
+
+        productoService.crear(dto);
         return "redirect:/admin/productos";
     }
 
@@ -75,14 +101,35 @@ public class controllerAdmin {
     public String actualizarProducto(@PathVariable Integer id,
                                      @ModelAttribute("productoForm") @Valid ProductoRequestDTO productoForm,
                                      BindingResult result,
+                                     @RequestParam(value = "imagenFile", required = false) MultipartFile imagenFile,
                                      Model model) {
+        String imagePath = productoForm.image(); // Mantener imagen actual por defecto
+
+        try {
+            if (imagenFile != null && !imagenFile.isEmpty()) {
+                imagePath = saveImage(imagenFile);
+            }
+        } catch (Exception e) {
+            result.rejectValue("image", "error.image", e.getMessage());
+        }
+
         if (result.hasErrors()) {
             model.addAttribute("productos", productoService.listarTodos());
             model.addAttribute("categorias", categoriaService.listarTodos());
+            model.addAttribute("modoEdicion", true);
+            model.addAttribute("productoId", id);
             return "Admin/AdminProductos";
         }
 
-        productoService.actualizar(id, productoForm);
+        ProductoRequestDTO dto = new ProductoRequestDTO(
+                productoForm.nombre(),
+                productoForm.precio(),
+                productoForm.stock(),
+                imagePath,
+                productoForm.idCategoria()
+        );
+
+        productoService.actualizar(id, dto);
         return "redirect:/admin/productos";
     }
 
@@ -90,6 +137,42 @@ public class controllerAdmin {
     public String eliminarProducto(@PathVariable Integer id) {
         productoService.eliminarPorId(id);
         return "redirect:/admin/productos";
+    }
+
+    private String saveImage(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IllegalArgumentException("El archivo debe ser una imagen válida.");
+        }
+
+        try {
+            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            
+            // Directorio en src/main/resources/static para persistencia
+            String uploadDirStr = "src/main/resources/static/img/uploads/";
+            File uploadDir = new File(uploadDirStr);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+            Path path = Paths.get(uploadDirStr + fileName);
+            Files.write(path, file.getBytes());
+
+            // Directorio en target/classes/static para disponibilidad inmediata en dev mode
+            String targetDirStr = "target/classes/static/img/uploads/";
+            File targetDir = new File(targetDirStr);
+            if (targetDir.exists()) {
+                Path targetPath = Paths.get(targetDirStr + fileName);
+                Files.write(targetPath, file.getBytes());
+            }
+
+            return "/img/uploads/" + fileName;
+        } catch (IOException e) {
+            throw new RuntimeException("Error al guardar la imagen", e);
+        }
     }
 
     @GetMapping("/usuarios")
