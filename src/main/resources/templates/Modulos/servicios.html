@@ -1,10 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: base(~{::contenido})}">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Servicio Técnico - PC Store</title>
 </head>
 <body>
+    <main th:fragment="contenido">
+        <!-- Hero Section -->
+        <section class="bg-dark text-white text-center py-5 mb-5" style="background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%) !important;">
+            <div class="container py-3">
+                <h1 class="display-4 fw-bold">Servicio Técnico Especializado</h1>
+                <p class="lead">Soluciones informáticas confiables, mantenimiento de hardware, reparación y optimización para tu PC o Laptop.</p>
+            </div>
+        </section>
 
+        <!-- Main Services Grid -->
+        <section class="container mb-5">
+            <h2 class="text-center fw-bold mb-5" style="color: #0e355a;">Nuestros Servicios</h2>
+            
+            <div class="row g-4">
+                <!-- Service 1 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm text-center p-4 hover-shadow" style="border-radius: 16px; transition: 0.3s;">
+                        <div class="text-primary mb-3">
+                            <div class="bg-primary bg-opacity-10 d-inline-flex p-3 rounded-circle">
+                                <i class="bi bi-cpu fs-1"></i>
+                            </div>
+                        </div>
+                        <h5 class="fw-bold card-title">Mantenimiento Preventivo</h5>
+                        <p class="card-text text-muted small">Limpieza interna completa, cambio de pasta térmica de alta calidad y optimización del flujo de aire.</p>
+                        <div class="mt-auto">
+                            <span class="d-block fw-bold text-dark fs-5 mb-3">Desde S/ 79.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 2 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm text-center p-4 hover-shadow" style="border-radius: 16px; transition: 0.3s;">
+                        <div class="text-warning mb-3">
+                            <div class="bg-warning bg-opacity-10 d-inline-flex p-3 rounded-circle">
+                                <i class="bi bi-lightning-charge-fill fs-1"></i>
+                            </div>
+                        </div>
+                        <h5 class="fw-bold card-title">Repotenciación de Equipos</h5>
+                        <p class="card-text text-muted small">Instalación de unidades de estado sólido (SSD), ampliación de memoria RAM y clonación de sistema.</p>
+                        <div class="mt-auto">
+                            <span class="d-block fw-bold text-dark fs-5 mb-3">Desde S/ 49.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 3 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm text-center p-4 hover-shadow" style="border-radius: 16px; transition: 0.3s;">
+                        <div class="text-danger mb-3">
+                            <div class="bg-danger bg-opacity-10 d-inline-flex p-3 rounded-circle">
+                                <i class="bi bi-wrench-adjustable-circle fs-1"></i>
+                            </div>
+                        </div>
+                        <h5 class="fw-bold card-title">Reparación de Hardware</h5>
+                        <p class="card-text text-muted small">Diagnóstico y solución de fallas físicas en placas madre, pantallas, fuentes de poder y bisagras.</p>
+                        <div class="mt-auto">
+                            <span class="d-block fw-bold text-dark fs-5 mb-3">Cotización Previa</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 4 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm text-center p-4 hover-shadow" style="border-radius: 16px; transition: 0.3s;">
+                        <div class="text-success mb-3">
+                            <div class="bg-success bg-opacity-10 d-inline-flex p-3 rounded-circle">
+                                <i class="bi bi-controller fs-1"></i>
+                            </div>
+                        </div>
+                        <h5 class="fw-bold card-title">Armado & Configuración</h5>
+                        <p class="card-text text-muted small">Armado personalizado de PCs Gamer, estaciones de diseño, ordenamiento de cables y pruebas de estrés.</p>
+                        <div class="mt-auto">
+                            <span class="d-block fw-bold text-dark fs-5 mb-3">Desde S/ 120.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Process Section -->
+        <section class="bg-light py-5 mb-5">
+            <div class="container">
+                <h2 class="text-center fw-bold mb-5" style="color: #0e355a;">¿Cómo funciona nuestro servicio?</h2>
+                
+                <div class="row g-4 justify-content-center text-center">
+                    <!-- Step 1 -->
+                    <div class="col-md-3">
+                        <div class="p-3">
+                            <div class="bg-white text-primary rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                                <h3 class="fw-bold m-0">1</h3>
+                            </div>
+                            <h5 class="fw-bold">Recepción</h5>
+                            <p class="text-muted small">Traes tu equipo a nuestra tienda o solicitas recojo a domicilio para una inspección inicial.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="col-md-3">
+                        <div class="p-3">
+                            <div class="bg-white text-primary rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                                <h3 class="fw-bold m-0">2</h3>
+                            </div>
+                            <h5 class="fw-bold">Diagnóstico & Cotización</h5>
+                            <p class="text-muted small">Nuestros técnicos identifican la falla y te envían un presupuesto detallado sin compromiso.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="col-md-3">
+                        <div class="p-3">
+                            <div class="bg-white text-primary rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                                <h3 class="fw-bold m-0">3</h3>
+                            </div>
+                            <h5 class="fw-bold">Reparación</h5>
+                            <p class="text-muted small">Con tu aprobación, procedemos con repuestos de calidad y pruebas exhaustivas de rendimiento.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="col-md-3">
+                        <div class="p-3">
+                            <div class="bg-white text-primary rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                                <h3 class="fw-bold m-0">4</h3>
+                            </div>
+                            <h5 class="fw-bold">Entrega</h5>
+                            <p class="text-muted small">Recoges tu equipo completamente funcional y con garantía por el trabajo realizado.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="container mb-5 text-center">
+            <div class="p-5 rounded-4 shadow-sm text-white" style="background: linear-gradient(135deg, #1f4068 0%, #162447 100%);">
+                <h3 class="fw-bold mb-3">¿Tu computadora está lenta o no enciende?</h3>
+                <p class="lead mb-4">No lo dejes al azar. Agenda una revisión técnica con nuestros expertos hoy mismo.</p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a th:href="@{/user/contacto}" class="btn btn-light btn-lg px-4 py-3 fw-bold text-dark">
+                        <i class="bi bi-calendar-event me-2"></i> Solicitar Cita
+                    </a>
+                    <a href="https://wa.me/51999999999" target="_blank" class="btn btn-success btn-lg px-4 py-3 fw-bold">
+                        <i class="bi bi-whatsapp me-2"></i> Consultar por WhatsApp
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
 </body>
 </html>

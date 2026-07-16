@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: base(~{::contenido})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Contacto - PC Store</title>
+</head>
+<body>
+    <main th:fragment="contenido">
+        <!-- Hero Section -->
+        <section class="bg-dark text-white text-center py-5 mb-5" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;">
+            <div class="container py-3">
+                <h1 class="display-4 fw-bold">Contáctanos</h1>
+                <p class="lead">¿Tienes alguna consulta o necesitas soporte? Escríbenos y te responderemos a la brevedad.</p>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="container mb-5">
+            <div class="row g-5">
+                <!-- Info Column -->
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-sm h-100 p-4" style="background-color: #f8f9fa; border-radius: 16px;">
+                        <h3 class="fw-bold mb-4" style="color: #0e355a;">Información de Contacto</h3>
+                        <p class="text-muted mb-4">Estamos a tu disposición para ayudarte a solucionar tus dudas de compra o de soporte técnico. ¡No dudes en visitarnos o comunicarte!</p>
+
+                        <!-- Contact list -->
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle me-3">
+                                <i class="bi bi-geo-alt-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Dirección</h6>
+                                <span class="text-muted">Av. Tecnológica 1234, Lima, Perú</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle me-3">
+                                <i class="bi bi-telephone-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Teléfono / WhatsApp</h6>
+                                <span class="text-muted">+51 999 999 999</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle me-3">
+                                <i class="bi bi-envelope-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Correo Electrónico</h6>
+                                <span class="text-muted">ventas@pcstore.com</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle me-3">
+                                <i class="bi bi-clock-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Horario de Atención</h6>
+                                <span class="text-muted">Lun - Sáb: 9:00 AM - 7:00 PM</span>
+                            </div>
+                        </div>
+
+                        <!-- Map -->
+                        <div class="mt-4 rounded-3 overflow-hidden shadow-sm" style="height: 200px;">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15606.311456950293!2d-77.0368269!3d-12.0463731!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c8c5c5c5c5c5%3A0xc5c5c5c5c5c5c5c5!2sLima!5e0!3m2!1ses!2spe!4v1620000000000!5m2!1ses!2spe" 
+                                    width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Column -->
+                <div class="col-lg-7">
+                    <div class="card border-0 shadow-sm p-4 p-md-5" style="border-radius: 16px;">
+                        <h3 class="fw-bold mb-4" style="color: #0e355a;">Envíanos un Mensaje</h3>
+                        
+                        <div th:if="${msg_success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${msg_success}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+
+                        <form action="#" method="POST" class="needs-validation" novalidate>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="name" class="form-label fw-semibold">Nombre Completo</label>
+                                    <input type="text" class="form-control form-control-lg bg-light border-0" id="name" placeholder="Ej. Juan Pérez" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label fw-semibold">Correo Electrónico</label>
+                                    <input type="email" class="form-control form-control-lg bg-light border-0" id="email" placeholder="juan@ejemplo.com" required>
+                                </div>
+                                <div class="col-12">
+                                    <label for="subject" class="form-label fw-semibold">Asunto</label>
+                                    <input type="text" class="form-control form-control-lg bg-light border-0" id="subject" placeholder="¿En qué podemos ayudarte?" required>
+                                </div>
+                                <div class="col-12">
+                                    <label for="message" class="form-label fw-semibold">Mensaje</label>
+                                    <textarea class="form-control bg-light border-0" id="message" rows="5" placeholder="Escribe aquí tu consulta detallada..." required></textarea>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <button class="btn btn-dark btn-lg w-100 py-3" type="submit" style="background-color: #111827; border: 0; border-radius: 12px; transition: 0.3s;">
+                                        <i class="bi bi-send-fill me-2"></i> Enviar Mensaje
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

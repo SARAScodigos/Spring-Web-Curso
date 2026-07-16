@@ -1,5 +1,6 @@
 package com.PC.Store.SistemaWeb.controller;
 
+import com.PC.Store.SistemaWeb.service.CategoriaService;
 import com.PC.Store.SistemaWeb.service.ProductoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class inicio {
 
     private final ProductoService productoService;
+    private final CategoriaService categoriaService;
 
     @GetMapping("/")
     public String home(Model model) {
@@ -23,20 +25,22 @@ public class inicio {
     @GetMapping("/productos")
     public String productos(Model model) {
         model.addAttribute("productos", productoService.listarTodos());
+        model.addAttribute("categorias", categoriaService.listarTodos());
         return "Modulos/productos";
     }
 
     @GetMapping("/nosotros")
     public String nosotros(){
-
         return "Modulos/nosotros";
     }
 
     @GetMapping("/contacto")
     public String contacto(){
-
         return "Modulos/contacto";
     }
 
-
+    @GetMapping("/servicios")
+    public String servicios(){
+        return "Modulos/servicios";
+    }
 }
